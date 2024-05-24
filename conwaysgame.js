@@ -3,9 +3,9 @@ class ConwayWorld extends Uint8ClampedArray {
     touched = false;
 
     constructor(w, h) {
+        super((w * h) / 8);
         this.width = w;
         this.height = h;
-        super(w * h / this.#BITS_PER_ELEMENT);
     }
 
     #index(x, y) {
@@ -42,12 +42,12 @@ class ConwayWorld extends Uint8ClampedArray {
         return !!(this[i] & (1 << j));
     }
 
-    #neigbors(x, y) {
+    neigbors(x, y) {
         let n = 0;
-        for (let a = x - 1; a <= x; ++a) {
-            for (let b = y - 1; b <= y; ++b) {
+        for (let a = x - 1; a <= x + 1; ++a) {
+            for (let b = y - 1; b <= y + 1; ++b) {
                 if (a == x && b == y) continue;
-                n += this.getCell(a, b);
+                n += this.getCell(a, b) | 0;
                 if (n > 3) break;
             }
         }
@@ -57,14 +57,14 @@ class ConwayWorld extends Uint8ClampedArray {
     nextGen() {
         let r = new ConwayWorld(this.width, this.height);
         for (let x = 0; x < this.width; ++x) {
-            for (let y = 0; x < this.height; ++y) {
+            for (let y = 0; y < this.height; ++y) {
                 const c = this.getCell(x, y);
-                const n = this.#neigbors(x, y);
+                const n = this.neigbors(x, y);
                 /*
                 Rule 1: a dead cell with exactly 3 neighbours comes alive
                 Rule 2: an alive cell with less than 2 or more than 3 neighbours dies
                 */
-                if (c ? (n >= 2 && n <= 3) : (n == 3)) {
+                if (c ? n >= 2 && n <= 3 : n == 3) {
                     r.setCell(x, y, true);
                 }
             }
@@ -82,7 +82,7 @@ function randomInit(world) {
     });
 }
 
-function generateNext(world, target) {
+function progress(world, target) {
     const next = world.nextGen();
     for (let x = 0; x < world.width; ++x) {
         for (let y = 0; y < world.height; ++y) {
@@ -92,19 +92,21 @@ function generateNext(world, target) {
     return next;
 }
 
-function loop() {
+function loop(target) {
     let world = new ConwayWorld(800, 600);
     randomInit(world);
 
-    const target = (x, y, c, n) => {
-        //...
-    };
+    const p = new Promise(resolve => {
+        const handle = setInterval(() => {
+            world = progress(world, target);
+    
+            if (!world.touched) {
+                clearInterval(handle);
+                console.log('All dead...');
+                resolve();
+            }
+        }, 200);
+    });
 
-    const handle = setInterval(() => {
-        world = generateNext(world, target);
-        if (!world.touched) {
-            clearInterval(handle);
-            console.log('All dead...');
-        }
-    }, 200);
+    return p;
 }
