@@ -99,16 +99,14 @@
         let setting = false;
 
         const drawPixel = (x, y, d, s) => {
-          if (d) {
-            x = Math.trunc(x * rx);
-            y = Math.trunc(y * ry);
-            const c = world.getCell(x, y);
-            if (c != s) {
-              const f = world.neigbors(x, y);
-              world.setCell(x, y, s);
-              paint(context, x, y, c, s, f);
-            }
-          }
+          if (!d) return;
+          x = Math.trunc(x * rx);
+          y = Math.trunc(y * ry);
+          const c = world.getCell(x, y);
+          if (c == s) return;
+          const f = world.neigbors(x, y);
+          world.setCell(x, y, s);
+          paint(context, x, y, c, s, f);
         };
 
         canvas.addEventListener("mousedown", (event) => {
