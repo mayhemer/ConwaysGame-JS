@@ -28,8 +28,18 @@
         );
       }
 
+      function download(content, fileName, contentType) {
+        var a = document.createElement("a");
+        var file = new Blob([content], { type: contentType });
+        a.href = URL.createObjectURL(file);
+        a.download = fileName;
+        a.click();
+      }
+
       window.addEventListener("load", async () => {
-        const button = document.getElementById("run");
+        const starter = document.getElementById("run");
+        const saver = document.getElementById("download");
+        const loader = document.getElementById("upload");
         const canvas = document.getElementById("c");
         const context = canvas.getContext("2d");
         context.fillRect(0, 0, canvas.width, canvas.height);
@@ -37,12 +47,34 @@
         const rx = canvas.width / canvas.clientWidth;
         const ry = canvas.height / canvas.clientHeight;
 
-        button.addEventListener("click", async () => {
-          button.setAttribute("disabled", true);
+        saver.addEventListener("click", () => {
+          download(
+            JSON.stringify(world),
+            `conwaysworld-${new Date().getTime() / 1000}.json`,
+            "application/json"
+          );
+        });
+
+        loader.addEventListener("change", (e) => {
+          const file = loader.files[0];
+          const reader = new FileReader();
+          reader.onload = (data) => {
+            const w = JSON.parse(data.target.result);
+            world = ConwayWorld.fromJSON(w);
+            ConwayWorldGame.paint(null, world, (x, y, c, n) => {
+              paintTarget(context, x, y, c, n);
+            });
+          };
+          reader.readAsText(file);
+        });
+
+        starter.addEventListener("click", async () => {
+          starter.setAttribute("disabled", true);
+          loader.setAttribute("disabled", true);
           active = true;
           await run(canvas, world);
           console.log("All dead...");
-          button.setAttribute("disabled", false);
+          starter.setAttribute("disabled", false);
           active = false;
         });
 
@@ -90,6 +122,9 @@
   </head>
   <body>
     <button id="run">Start the game</button>
+    <button id="download">Save the init world to a local file</button>
+    Load a world from a local file:
+    <input type="file" id="upload" accept="application/json" />
     <canvas id="c" width="300" height="150"></canvas>
   </body>
 </html>
