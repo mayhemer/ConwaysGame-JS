@@ -90,8 +90,9 @@
           active = true;
           await run(canvas, world);
           console.log("All dead...");
-          starter.setAttribute("disabled", false);
+          starter.removeAttribute("disabled");
           active = false;
+          world = new ConwayWorld(canvas.width, canvas.height);
         });
 
         let world = new ConwayWorld(canvas.width, canvas.height);
