@@ -33,7 +33,13 @@ class ConwayWorld extends Uint8ClampedArray {
     }
   }
 
-  getCell(x, y) {
+  getCell(x, y, loop = false) {
+    if (loop) {
+      if (x < 0) x += this.width;
+      if (x >= this.width) x -= this.width;
+      if (y < 0) y += this.height;
+      if (y >= this.height) y -= this.height;
+    }
     if (this.#isOutbound(x, y)) {
       return false;
     }
@@ -47,7 +53,7 @@ class ConwayWorld extends Uint8ClampedArray {
     for (let a = x - 1; a <= x + 1; ++a) {
       for (let b = y - 1; b <= y + 1; ++b) {
         if (a == x && b == y) continue;
-        n += this.getCell(a, b) | 0;
+        n += this.getCell(a, b, true) | 0;
         if (n > 3) break;
       }
     }
