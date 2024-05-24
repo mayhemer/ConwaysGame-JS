@@ -1,51 +1,95 @@
-<!DOCTYPE html>
 <html>
+  <!DOCTYPE html>
   <head>
     <script src="conwaysgame.js"></script>
     <script src="unittest.js" async="true"></script>
     <script>
-      const cellSize = 3;
+      let active = false;
 
-      function run() {
-        const canvas = document.getElementById("c");
+      function paintTarget(context, x, y, c, n) {
+        if (c == n) {
+          return;
+        }
+        if (n) {
+          context.fillRect(x, y, 1, 1);
+        } else {
+          context.clearRect(x, y, 1, 1);
+        }
+      }
+
+      function run(canvas, world) {
         const context = canvas.getContext("2d");
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = "#fff";
         return ConwayWorldGame.loop(
-          canvas.width / cellSize,
-          canvas.height / cellSize,
+          world,
           (x, y, c, n) => {
-            if (c == n) {
-              return;
-            }
-            if (n) {
-              context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-            } else {
-              context.clearRect(x * cellSize, y * cellSize, cellSize, cellSize);
-            }
+            paintTarget(context, x, y, c, n);
           },
           60
         );
       }
 
       window.addEventListener("load", async () => {
-        await run();
-        context.fillStyle = "#d00";
+        const button = document.getElementById("run");
+        const canvas = document.getElementById("c");
+        const context = canvas.getContext("2d");
         context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "#fff";
+        const rx = canvas.width / canvas.clientWidth;
+        const ry = canvas.height / canvas.clientHeight;
+
+        button.addEventListener("click", async () => {
+          button.setAttribute("disabled", true);
+          active = true;
+          await run(canvas, world);
+          console.log("All dead...");
+          button.setAttribute("disabled", false);
+          active = false;
+        });
+
+        let world = new ConwayWorld(canvas.width, canvas.height);
+        let drawing = false;
+        let setting = false;
+
+        const drawPixel = (x, y, d, s) => {
+          x = Math.trunc(x * rx);
+          y = Math.trunc(y * ry);
+          if (d) {
+            const c = world.getCell(x, y);
+            world.setCell(x, y, s);
+            paintTarget(context, x, y, c, s);
+          }
+        };
+
+        canvas.addEventListener("mousedown", () => {
+          drawing = !active;
+          setting = true; // for future use
+          drawPixel(event.offsetX, event.offsetY, drawing, setting);
+        });
+        canvas.addEventListener("mouseup", () => {
+          drawing = false;
+        });
+        canvas.addEventListener("mousemove", (event) => {
+          drawPixel(event.offsetX, event.offsetY, drawing, setting);
+        });
       });
     </script>
     <style>
       html {
         background: black;
+        color: white;
+      }
+      button {
+        margin: 1em auto;
       }
       canvas {
         width: 100%;
         height: 90wh;
-        /* border: solid 1px gray; */
+        border: solid 1px yellow;
       }
     </style>
   </head>
   <body>
-    <canvas id="c" width="200" height="100"></canvas>
+    <button id="run">Start the game</button>
+    <canvas id="c" width="1000" height="500"></canvas>
   </body>
 </html>
