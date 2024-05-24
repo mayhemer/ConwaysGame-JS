@@ -74,6 +74,8 @@
           const reader = new FileReader();
           reader.onload = (data) => {
             const w = JSON.parse(data.target.result);
+            canvas.width = w.width;
+            canvas.height = w.height;
             world = ConwayWorld.fromJSON(w);
             ConwayWorldGame.paint(null, world, (x, y, c, n, f) => {
               paint(context, x, y, c, n, f);
