@@ -97,20 +97,22 @@ class ConwayWorldGame {
     return next;
   }
 
-  static loop(width, height, target, interval) {
+  static randomizedLoop(width, height, target, interval) {
     const w0 = new ConwayWorld(width, height);
     let world = new ConwayWorld(width, height);
 
     this.#randomInit(world);
     this.#paint(w0, world, target);
+    return this.loop(world, target, interval);
+  }
 
+  static loop(world, target, interval) {
     return new Promise((resolve) => {
       const handle = setInterval(() => {
         world = this.#progress(world, target);
 
         if (!world.touched) {
           clearInterval(handle);
-          console.log("All dead...");
           resolve();
           return;
         }
