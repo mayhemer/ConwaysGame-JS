@@ -110,26 +110,31 @@ class ConwayWorldGame {
     return next;
   }
 
-  static randomizedLoop(width, height, target, interval) {
+  static randomizedLoop(width, height, target, interval, handle) {
     const w0 = new ConwayWorld(width, height);
     let world = new ConwayWorld(width, height);
 
     this.#randomInit(world);
     this.paint(w0, world, target);
-    return this.loop(world, target, interval);
+    return this.loop(world, target, interval, handle);
   }
 
-  static loop(world, target, interval) {
-    return new Promise((resolve) => {
-      const handle = setInterval(() => {
+  static loop(world, target, interval, handle) {
+    return new Promise(resolve => {
+      const timer = setInterval(() => {
         world = this.#progress(world, target);
 
         if (!world.touched) {
-          clearInterval(handle);
+          clearInterval(timer);
           resolve();
           return;
         }
       }, interval);
+      handle.stop = () => {
+        clearInterval(timer);
+        handle.stop = null;
+        resolve();
+      }
     });
   }
 }

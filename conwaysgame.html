@@ -28,14 +28,15 @@
         }
       }
 
-      function run(canvas, world) {
+      function run(canvas, world, stopper) {
         const context = canvas.getContext("2d");
         return ConwayWorldGame.loop(
           world,
           (x, y, c, n, f) => {
             paint(context, x, y, c, n, f);
           },
-          60
+          60,
+          stopper
         );
       }
 
@@ -48,6 +49,7 @@
       }
 
       window.addEventListener("load", async () => {
+        const reverter = document.getElementById("revert");
         const starter = document.getElementById("run");
         const fs = document.getElementById("fs");
         const saver = document.getElementById("download");
@@ -57,6 +59,7 @@
         context.fillRect(0, 0, canvas.width, canvas.height);
         const rx = canvas.width / canvas.clientWidth;
         const ry = canvas.height / canvas.clientHeight;
+        const stopper = {};
 
         saver.addEventListener("click", () => {
           download(
@@ -89,11 +92,17 @@
           starter.setAttribute("disabled", true);
           loader.setAttribute("disabled", true);
           active = true;
-          await run(canvas, world);
-          console.log("All dead...");
+          await run(canvas, world, stopper);
           starter.removeAttribute("disabled");
           active = false;
-          world = new ConwayWorld(canvas.width, canvas.height);
+        });
+
+        reverter.addEventListener("click", () => {
+          if (stopper.stop) stopper.stop();
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          ConwayWorldGame.paint(null, world, (x, y, c, n, f) => {
+            paint(context, x, y, c, n, f);
+          });
         });
 
         fs.addEventListener("click", () => {
@@ -146,6 +155,7 @@
     </style>
   </head>
   <body>
+    <button id="revert">&lt;--</button>
     <button id="run">Start the game</button>
     <button id="fs">Fullscreen</button>
     <button id="download">Save the init world to a local file</button>
