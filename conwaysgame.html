@@ -92,10 +92,14 @@
           }
         };
 
-        canvas.addEventListener("mousedown", () => {
+        canvas.addEventListener("mousedown", (e) => {
+          e.stopPropagation();
+          e.preventDefault();
           drawing = !active;
-          setting = true; // for future use
+          setting = !e.shiftKey;
           drawPixel(event.offsetX, event.offsetY, drawing, setting);
+
+          return false;
         });
         canvas.addEventListener("mouseup", () => {
           drawing = false;
