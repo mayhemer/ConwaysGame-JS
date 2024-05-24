@@ -5,11 +5,13 @@
     <script src="unittest.js" async="true"></script>
     <script>
       let active = false;
+      const friendliness = ['black','salmon','green','lightgreen','lightblue','lightgreen','yellow','white'];
 
-      function paintTarget(context, x, y, c, n) {
+      function paint(context, x, y, c, n, f) {
         if (c == n) {
           return;
         }
+        context.fillStyle = friendliness[f];
         if (n) {
           context.fillRect(x, y, 1, 1);
         } else {
@@ -21,8 +23,8 @@
         const context = canvas.getContext("2d");
         return ConwayWorldGame.loop(
           world,
-          (x, y, c, n) => {
-            paintTarget(context, x, y, c, n);
+          (x, y, c, n, f) => {
+            paint(context, x, y, c, n, f);
           },
           60
         );
@@ -43,7 +45,6 @@
         const canvas = document.getElementById("c");
         const context = canvas.getContext("2d");
         context.fillRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = "#fff";
         const rx = canvas.width / canvas.clientWidth;
         const ry = canvas.height / canvas.clientHeight;
 
@@ -61,8 +62,8 @@
           reader.onload = (data) => {
             const w = JSON.parse(data.target.result);
             world = ConwayWorld.fromJSON(w);
-            ConwayWorldGame.paint(null, world, (x, y, c, n) => {
-              paintTarget(context, x, y, c, n);
+            ConwayWorldGame.paint(null, world, (x, y, c, n, f) => {
+              paint(context, x, y, c, n, f);
             });
           };
           reader.readAsText(file);
@@ -87,8 +88,9 @@
           y = Math.trunc(y * ry);
           if (d) {
             const c = world.getCell(x, y);
+            const f = world.neigbors(x, y);
             world.setCell(x, y, s);
-            paintTarget(context, x, y, c, s);
+            paint(context, x, y, c, s, f);
           }
         };
 

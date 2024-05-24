@@ -99,7 +99,7 @@ class ConwayWorldGame {
   static paint(world, next, target) {
     for (let x = 0; x < next.width; ++x) {
       for (let y = 0; y < next.height; ++y) {
-        target(x, y, world && world.getCell(x, y), next.getCell(x, y));
+        target(x, y, world && world.getCell(x, y), next.getCell(x, y), next.neigbors(x, y));
       }
     }
   }
