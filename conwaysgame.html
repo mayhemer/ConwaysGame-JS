@@ -120,7 +120,7 @@
         canvas.addEventListener("mouseup", () => {
           drawing = false;
         });
-        canvas.addEventListener("mousemove", () => {
+        canvas.addEventListener("mousemove", (event) => {
           drawPixel(event.offsetX, event.offsetY, drawing, setting);
         });
       });
