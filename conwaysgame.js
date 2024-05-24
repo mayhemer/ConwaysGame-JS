@@ -75,10 +75,8 @@ class ConwayWorld extends Uint8ClampedArray {
       for (let y = 0; y < this.height; ++y) {
         const c = this.getCell(x, y);
         const n = this.neigbors(x, y);
-        /*
-                Rule 1: a dead cell with exactly 3 neighbours comes alive
-                Rule 2: an alive cell with less than 2 or more than 3 neighbours dies
-                */
+        // Rule 1: a dead cell with exactly 3 neighbours comes alive
+        // Rule 2: an alive cell with less than 2 or more than 3 neighbours diesÍ
         if (c ? n >= 2 && n <= 3 : n == 3) {
           r.setCell(x, y, true);
         }
