@@ -26,9 +26,6 @@
     check(w.neigbors(2, 4) == 1);
     check(w.neigbors(3, 4) == 1);
     check(w.neigbors(4, 4) == 1);
-    w.setCell(2, 3, true);
-    //...
-
     
     // only one cell alive means next gen is all-dead
     let w2 = w.nextGen();
@@ -69,6 +66,30 @@
     for (let x = 0; x < 5; ++x) for (let y = 0; y < 5; ++y) {
         check(w1.getCell(x, y) == w0.getCell(x, y), `stable x=${x} y=${y}`);
     }
+    
+    // check leaks to other side
+    let wn = new ConwayWorld(6, 8);
+    wn.setCell(0, 2, true);
+    wn.setCell(0, 3, true);
+    wn.setCell(0, 4, true);
+    wn.setCell(0, 5, true);
+    wn.setCell(0, 6, true);
+    check(!wn.neigbors(5, 0));
+    check(!wn.neigbors(5, 1));
+    check(!wn.neigbors(5, 2));
+    check(!wn.neigbors(5, 3));
+    check(!wn.neigbors(5, 4));
+    wn = wn.nextGen(); 
+    check(!wn.getCell(5, 0));
+    check(!wn.getCell(5, 1));
+    check(!wn.getCell(5, 2));
+    check(!wn.getCell(5, 3));
+    check(!wn.getCell(5, 4));
+    check(!wn.neigbors(5, 0));
+    check(!wn.neigbors(5, 1));
+    check(!wn.neigbors(5, 2));
+    check(!wn.neigbors(5, 3));
+    check(!wn.neigbors(5, 4));
 
     console.log('unittest end');
 })();
