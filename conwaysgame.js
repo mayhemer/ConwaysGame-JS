@@ -8,6 +8,15 @@ class ConwayWorld extends Uint8ClampedArray {
     this.height = h;
   }
 
+  static fromJSON(json) {
+    const w = new ConwayWorld(json.width, json.height);
+    w.touched = json.touched;
+    for (let i = 0; i < w.length; ++i) {
+      w[i] = json[i];
+    }
+    return w;
+  }
+
   #index(x, y) {
     const m = x + y * this.width;
     const i = (m / this.#BITS_PER_ELEMENT) | 0;
@@ -89,17 +98,17 @@ class ConwayWorldGame {
     });
   }
 
-  static #paint(world, next, target) {
-    for (let x = 0; x < world.width; ++x) {
-      for (let y = 0; y < world.height; ++y) {
-        target(x, y, world.getCell(x, y), next.getCell(x, y));
+  static paint(world, next, target) {
+    for (let x = 0; x < next.width; ++x) {
+      for (let y = 0; y < next.height; ++y) {
+        target(x, y, world && world.getCell(x, y), next.getCell(x, y));
       }
     }
   }
 
   static #progress(world, target) {
     const next = world.nextGen();
-    this.#paint(world, next, target);
+    this.paint(world, next, target);
     return next;
   }
 
@@ -108,7 +117,7 @@ class ConwayWorldGame {
     let world = new ConwayWorld(width, height);
 
     this.#randomInit(world);
-    this.#paint(w0, world, target);
+    this.paint(w0, world, target);
     return this.loop(world, target, interval);
   }
 
