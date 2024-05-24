@@ -74,39 +74,49 @@ class ConwayWorld extends Uint8ClampedArray {
     }    
 }
 
-function randomInit(world) {
-    world.forEach(() => {
-        const a = Math.random() * 256;
-        const b = Math.random() * 256;
-        world[i] = a && b; // to sparse...
-    });
-}
-
-function progress(world, target) {
-    const next = world.nextGen();
-    for (let x = 0; x < world.width; ++x) {
-        for (let y = 0; y < world.height; ++y) {
-            target(x, y, world.getCell(x, y), next.getCell(x, y));
-        }
+class ConwayWorldGame {
+    static #randomInit(world) {
+        world.forEach((e, i) => {
+            const a = Math.random() * 256;
+            const b = Math.random() * 256;
+            world[i] = a && b; // to sparse...
+        });
     }
-    return next;
-}
-
-function loop(target) {
-    let world = new ConwayWorld(800, 600);
-    randomInit(world);
-
-    const p = new Promise(resolve => {
-        const handle = setInterval(() => {
-            world = progress(world, target);
     
-            if (!world.touched) {
-                clearInterval(handle);
-                console.log('All dead...');
-                resolve();
+    static #paint(world, next, target) {
+        for (let x = 0; x < world.width; ++x) {
+            for (let y = 0; y < world.height; ++y) {
+                target(x, y, world.getCell(x, y), next.getCell(x, y));
             }
-        }, 200);
-    });
+        }
+        
+    }
+    
+    static #progress(world, target) {
+        const next = world.nextGen();
+        this.#paint(world, next, target);
+        return next;
+    }
+    
+    static loop(width, height, target, interval) {
+        const w0 = new ConwayWorld(width, height);
+        let world = new ConwayWorld(width, height);
 
-    return p;
+        this.#randomInit(world);
+        this.#paint(w0, world, target);
+        
+        return new Promise(resolve => {
+            const handle = setInterval(() => {
+                world = this.#progress(world, target);
+                
+                if (!world.touched) {
+                    clearInterval(handle);
+                    console.log('All dead...');
+                    resolve();
+                    return;
+                }
+
+            }, interval);
+        });
+    }    
 }
