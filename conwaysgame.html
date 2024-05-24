@@ -49,6 +49,7 @@
 
       window.addEventListener("load", async () => {
         const starter = document.getElementById("run");
+        const fs = document.getElementById("fs");
         const saver = document.getElementById("download");
         const loader = document.getElementById("upload");
         const canvas = document.getElementById("c");
@@ -93,6 +94,10 @@
           starter.removeAttribute("disabled");
           active = false;
           world = new ConwayWorld(canvas.width, canvas.height);
+        });
+
+        fs.addEventListener("click", () => {
+          canvas.requestFullscreen();
         });
 
         let world = new ConwayWorld(canvas.width, canvas.height);
@@ -142,6 +147,7 @@
   </head>
   <body>
     <button id="run">Start the game</button>
+    <button id="fs">Fullscreen</button>
     <button id="download">Save the init world to a local file</button>
     Load a world from a local file:
     <input type="file" id="upload" accept="application/json" />
