@@ -130,6 +130,7 @@
           world = ConwayWorldUtils.enlarge(world);
           canvas.width = world.width;
           canvas.height = world.height;
+          onCanvasChanged();
           repaintCanvas();
         });
 
@@ -137,6 +138,7 @@
           world = ConwayWorldUtils.shrink(world);
           canvas.width = world.width;
           canvas.height = world.height;
+          onCanvasChanged();
           repaintCanvas();
         });
 
