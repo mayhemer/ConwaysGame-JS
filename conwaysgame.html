@@ -56,6 +56,9 @@
         const saver = document.getElementById("download");
         const loader = document.getElementById("upload");
         const center = document.getElementById("center");
+        const enlarge = document.getElementById("enlarge");
+        const shrink = document.getElementById("shrink");
+
         const canvas = document.getElementById("c");
         const context = canvas.getContext("2d");
         context.fillRect(0, 0, canvas.width, canvas.height);
@@ -63,7 +66,6 @@
         const stopper = {};
 
         const repaintCanvas = () => {
-          const context = canvas.getContext("2d");
           context.fillRect(0, 0, canvas.width, canvas.height);
           ConwayWorldGame.paint(null, world, (x, y, c, n, f) => {
             paint(context, x, y, c, n, f);
@@ -121,6 +123,20 @@
 
         center.addEventListener("click", () => {
           world = ConwayWorldUtils.center(world);
+          repaintCanvas();
+        });
+
+        enlarge.addEventListener("click", () => {
+          world = ConwayWorldUtils.enlarge(world);
+          canvas.width = world.width;
+          canvas.height = world.height;
+          repaintCanvas();
+        });
+
+        shrink.addEventListener("click", () => {
+          world = ConwayWorldUtils.shrink(world);
+          canvas.width = world.width;
+          canvas.height = world.height;
           repaintCanvas();
         });
 
@@ -186,6 +202,8 @@
     <input type="file" id="upload" accept="application/json" />
     <br />
     <button id="center">&#x271c;</button>
+    <button id="enlarge">&#8613;</button>
+    <button id="shrink">&#8615;</button>
     <canvas id="c" width="300" height="150"></canvas>
   </body>
 </html>
