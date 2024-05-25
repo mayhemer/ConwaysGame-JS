@@ -57,9 +57,14 @@
         const canvas = document.getElementById("c");
         const context = canvas.getContext("2d");
         context.fillRect(0, 0, canvas.width, canvas.height);
-        const rx = canvas.width / canvas.clientWidth;
-        const ry = canvas.height / canvas.clientHeight;
+        let rx, ry;
         const stopper = {};
+
+        const onCanvasChanged = () => {
+          rx = canvas.width / canvas.clientWidth;
+          ry = canvas.height / canvas.clientHeight;
+        };
+        onCanvasChanged();
 
         saver.addEventListener("click", () => {
           download(
@@ -76,6 +81,7 @@
             const w = JSON.parse(data.target.result);
             canvas.width = w.width;
             canvas.height = w.height;
+            onCanvasChanged();
             world = ConwayWorld.fromJSON(w);
             ConwayWorldGame.paint(null, world, (x, y, c, n, f) => {
               paint(context, x, y, c, n, f);
@@ -116,21 +122,26 @@
         let drawing = false;
         let setting = false;
 
+        const coords = (x, y) => {
+          return { x: Math.trunc(x * rx), y: Math.trunc(y * ry) };
+        };
+
         const drawPixel = (x, y, d, s) => {
           if (!d) return;
-          x = Math.trunc(x * rx);
-          y = Math.trunc(y * ry);
-          const c = world.getCell(x, y);
+          const p = coords(x, y);
+          const c = world.getCell(p.x, p.y);
           if (c == s) return;
-          const f = world.neigbors(x, y);
-          world.setCell(x, y, s);
-          paint(context, x, y, c, s, f);
+          const f = world.neigbors(p.x, p.y);
+          world.setCell(p.x, p.y, s);
+          paint(context, p.x, p.y, c, s, f);
         };
 
         canvas.addEventListener("mousedown", (event) => {
           event.stopPropagation();
+          event.preventDefault();
+          const p = coords(event.offsetX, event.offsetY);
           drawing = !active;
-          setting = !event.shiftKey;
+          setting = !world.getCell(p.x, p.y);
           drawPixel(event.offsetX, event.offsetY, drawing, setting);
         });
         canvas.addEventListener("mouseup", () => {
