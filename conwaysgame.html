@@ -2,6 +2,7 @@
   <!DOCTYPE html>
   <head>
     <script src="conwaysgame.js"></script>
+    <script src="utils.js"></script>
     <script src="unittest.js" async="true"></script>
     <script>
       let active = false;
@@ -54,11 +55,20 @@
         const fs = document.getElementById("fs");
         const saver = document.getElementById("download");
         const loader = document.getElementById("upload");
+        const center = document.getElementById("center");
         const canvas = document.getElementById("c");
         const context = canvas.getContext("2d");
         context.fillRect(0, 0, canvas.width, canvas.height);
         let rx, ry;
         const stopper = {};
+
+        const repaintCanvas = () => {
+          const context = canvas.getContext("2d");
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          ConwayWorldGame.paint(null, world, (x, y, c, n, f) => {
+            paint(context, x, y, c, n, f);
+          });
+        };
 
         const onCanvasChanged = () => {
           rx = canvas.width / canvas.clientWidth;
@@ -83,9 +93,7 @@
             canvas.height = w.height;
             onCanvasChanged();
             world = ConwayWorld.fromJSON(w);
-            ConwayWorldGame.paint(null, world, (x, y, c, n, f) => {
-              paint(context, x, y, c, n, f);
-            });
+            repaintCanvas();
           };
           reader.readAsText(file);
         });
@@ -108,10 +116,12 @@
 
         reverter.addEventListener("click", () => {
           if (stopper.stop) stopper.stop();
-          context.fillRect(0, 0, canvas.width, canvas.height);
-          ConwayWorldGame.paint(null, world, (x, y, c, n, f) => {
-            paint(context, x, y, c, n, f);
-          });
+          repaintCanvas();
+        });
+
+        center.addEventListener("click", () => {
+          world = ConwayWorldUtils.center(world);
+          repaintCanvas();
         });
 
         fs.addEventListener("click", () => {
@@ -135,7 +145,6 @@
           world.setCell(p.x, p.y, s);
           paint(context, p.x, p.y, c, s, f);
         };
-
         canvas.addEventListener("mousedown", (event) => {
           event.stopPropagation();
           event.preventDefault();
@@ -175,6 +184,8 @@
     <button id="download">Save the init world to a local file</button>
     Load a world from a local file:
     <input type="file" id="upload" accept="application/json" />
+    <br />
+    <button id="center">&#x271c;</button>
     <canvas id="c" width="300" height="150"></canvas>
   </body>
 </html>
