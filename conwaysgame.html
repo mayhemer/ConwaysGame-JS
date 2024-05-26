@@ -5,19 +5,39 @@
     <script src="utils.js"></script>
     <script src="unittest.js" async="true"></script>
     <script>
-      let active = false;
-      const friendliness = [
-        "white",
-        "salmon",
-        "green",
-        "lightgreen",
-        "lightblue",
-        "lightgreen",
-        "yellow",
-        "white",
-      ];
+      class StateMonitor {
+        #active = false;
+        #disable = [];
+        constructor(...disable) {
+          this.#disable = Array.from(disable);
+        }
+        get active() {
+          return this.#active;
+        }
+        set active(a) {
+          this.#active = a;
+          this.#disable
+            .forEach((e) => {
+              a
+                ? e.setAttribute("disabled", true)
+                : e.removeAttribute("disabled");
+            });
+        }
+      }
+
+      let state;
 
       function paint(context, x, y, c, n, f) {
+        const friendliness = [
+          "white",
+          "salmon",
+          "green",
+          "lightgreen",
+          "lightblue",
+          "lightgreen",
+          "yellow",
+          "white",
+        ];
         if (c == n) {
           return;
         }
@@ -65,6 +85,8 @@
         let rx, ry;
         const stopper = {};
 
+        state = new StateMonitor(starter, loader, center, enlarge, shrink);
+
         const repaintCanvas = () => {
           context.fillRect(0, 0, canvas.width, canvas.height);
           ConwayWorldGame.paint(null, world, (x, y, c, n, f) => {
@@ -107,13 +129,9 @@
         }
 
         starter.addEventListener("click", async () => {
-          starter.setAttribute("disabled", true);
-          loader.setAttribute("disabled", true);
-          active = true;
+          state.active = true;
           await run(canvas, world, stopper);
-          starter.removeAttribute("disabled");
-          loader.removeAttribute("disabled");
-          active = false;
+          state.active = false;
         });
 
         reverter.addEventListener("click", () => {
@@ -167,7 +185,7 @@
           event.stopPropagation();
           event.preventDefault();
           const p = coords(event.offsetX, event.offsetY);
-          drawing = !active;
+          drawing = !state.active;
           setting = !world.getCell(p.x, p.y);
           drawPixel(event.offsetX, event.offsetY, drawing, setting);
         });
