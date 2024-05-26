@@ -18,8 +18,8 @@ class ConwayWorldUtils {
 
     const ax = (hx + lx) / 2;
     const ay = (hy + ly) / 2;
-    const dx = Math.round(world.width / 2 - ax);
-    const dy = Math.round(world.height / 2 - ay);
+    const dx = (world.width / 2 - ax) | 0
+    const dy = (world.height / 2 - ay) | 0
 
     const r = new ConwayWorld(world.width, world.height);
     for (let x = 0; x < world.width; ++x) {
@@ -35,8 +35,8 @@ class ConwayWorldUtils {
 
   static enlarge(world) {
     const r = new ConwayWorld(world.width * 2, world.height * 2);
-    const dx = Math.round(world.width / 2);
-    const dy = Math.round(world.height / 2);
+    const dx = (world.width / 2) | 0
+    const dy = (world.height / 2) | 0
 
     for (let x = 0; x < world.width; ++x) {
       for (let y = 0; y < world.height; ++y) {
@@ -51,8 +51,8 @@ class ConwayWorldUtils {
 
   static shrink(world) {
     const r = new ConwayWorld(world.width / 2, world.height / 2);
-    const dx = Math.round(world.width / 4);
-    const dy = Math.round(world.height / 4);
+    const dx = (world.width / 4) | 0
+    const dy = (world.height / 4) | 0
 
     for (let x = dx; x < dx * 3; ++x) {
       for (let y = dy; y < dy * 3; ++y) {
