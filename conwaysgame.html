@@ -16,12 +16,11 @@
         }
         set active(a) {
           this.#active = a;
-          this.#disable
-            .forEach((e) => {
-              a
-                ? e.setAttribute("disabled", true)
-                : e.removeAttribute("disabled");
-            });
+          this.#disable.forEach((e) => {
+            a
+              ? e.setAttribute("disabled", true)
+              : e.removeAttribute("disabled");
+          });
         }
       }
 
@@ -185,12 +184,12 @@
           event.stopPropagation();
           event.preventDefault();
           const p = coords(event.offsetX, event.offsetY);
-          drawing = !state.active;
+          drawing = !state.active && event.button == 0;
           setting = !world.getCell(p.x, p.y);
           drawPixel(event.offsetX, event.offsetY, drawing, setting);
         });
-        canvas.addEventListener("mouseup", () => {
-          drawing = false;
+        canvas.addEventListener("mouseup", (event) => {
+          if (event.button == 0) drawing = false;
         });
         canvas.addEventListener("mousemove", (event) => {
           drawPixel(event.offsetX, event.offsetY, drawing, setting);
